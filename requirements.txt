@@ -24,7 +24,8 @@ requests==2.31.0
 # # Web Interface
 # streamlit==1.27.2
 # gradio==3.40.1
-
+gunicorn==21.2.0
 # # Utilities
 # python-multipart==0.0.6
+
 # Werkzeug==2.3.7 
