@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainyac - Your Fun Learning Adventure!</title>
+    <!-- Link to your main CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Kid-Friendly Color Palette & Styles */
+        :root {
+            --primary-blue: #38B6FF;
+            --secondary-yellow: #FFD93D;
+            --accent-green: #6BCB77;
+            --dark-text: #464E5F;
+            --light-bg: #F9F9F9;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Baloo 2', cursive;
+            background-color: var(--light-bg);
+        }
+
+        .hero {
+            background-color: var(--primary-blue);
+            background-image: url('https://www.transparenttextures.com/patterns/stars.png');
+            color: var(--white);
+            text-align: center;
+            padding: 80px 20px;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+        }           
+        .hero .logo-container img {
+            width: 500px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        } 
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.7;
+        }
+        .hero .btn {
+            background: var(--secondary-yellow);
+            color: var(--dark-text);
+            padding: 18px 35px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            box-shadow: 0 6px 0 #F4B301;
+            transition: all 0.2s ease;
+        }
+        .hero .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #F4B301;
+        }
+        .hero .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #F4B301;
+        }
+
+        .section {
+            padding: 80px 20px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 50px;
+            color: var(--dark-text);
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            border: 3px solid #eee;
+        }
+        .feature-card:hover {
+            transform: scale(1.05);
+            border-color: var(--secondary-yellow);
+        }
+        .feature-card .illustration {
+            width: 100%;
+            max-width: 180px;
+            height: 140px;
+            margin: 0 auto 25px;
+            object-fit: contain;
+        }
+        .feature-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark-text);
+        }
+        .feature-card p {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+
+        .cta-section {
+            background: var(--accent-green);
+            color: var(--white);
+            text-align: center;
+            padding: 80px 20px;
+            border-radius: 40px;
+            margin: 40px 20px;
+        }
+        .cta-section .btn {
+            background: var(--white);
+            color: var(--accent-green);
+            font-weight: 800;
+            padding: 18px 35px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            box-shadow: 0 6px 0 #4a9352;
+        }
+         .cta-section .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #4a9352;
+        }
+        .cta-section .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #4a9352;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='BOT-TEACHER-UNFILTERED-removebg.png') }}" alt="Brainyac Logo">
+            </div>
+            <h1>Your Super Fun Learning Adventure!</h1>
+            <p>
+                Say hello to Brainyac, your amazing AI buddy! Get help with tricky homework, make cool flashcards, and play fun quizzes to become a learning superstar!
+            </p>
+            <a href="{{ url_for('auth') }}" class="btn">
+                <i class="fas fa-rocket"></i> Let's Go!
+            </a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">What's Inside?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <img src="{{ url_for('static', filename='AI-Buddy-removebg.png') }}" alt="AI Doubt Solver" class="illustration" style = "width: 400px;  height: auto;">
+                    <h3>Your AI Buddy, Dobby</h3>
+                    <p>Stuck on a question? Dobby the robot is here to help you figure it out, any time of the day!</p>
+                </div>
+                <div class="feature-card">
+                    <img src="{{ url_for('static', filename='flashcard-removebg.png') }}" alt="Smart Flashcards" class="illustration" style = "width: 400px;  height: auto;">
+                    <h3>Magic Flashcards</h3>
+                    <p>Tell us a topic and poof! We'll make awesome flashcards for you to study for your next test.</p>
+                </div>
+                <div class="feature-card">
+                    <img src="{{ url_for('static', filename='quiz_game-removebg.png') }}" alt="Interactive Q&A Sessions" class="illustration" style = "width: 400px;  height: auto;">
+                    <h3>Fun Quiz Games</h3>
+                    <p>Play cool quiz games to test your brainpower and earn points to become a Brainyac champion!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Call to Action Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="section-title" style="color: var(--white);">Ready to Start Your Adventure?</h2>
+            <a href="{{ url_for('auth') }}" class="btn">
+                Join the Fun!
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Brainyac. Where learning is an adventure!</p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+
+{% block title %}Dobby - Your AI Doubt Solver{% endblock %}
+
+{% block navbar %}
+<nav class="navbar">
+    <div class="dobby-header">
+        <div class="dobby-icon">
+            <i class="fas fa-robot"></i>
+        </div>
+        <h1>Dobby - Your AI Doubt Solver</h1>
+    </div>
+    <a href="{{ url_for('student_dashboard') }}" class="back-to-dashboard-btn">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="dobby-container">
+    <div class="chat-window">
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                <div class="message-sender">Dobby</div>
+                <div class="message-content">
+                    Hello! I'm Dobby, your AI doubt solver. How can I help you today?
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <input type="text" id="user-input" placeholder="Ask Dobby anything..." class="chat-input-field">
+            <button id="ask-button" class="ask-button">
+                <i class="fas fa-paper-plane"></i> Ask
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Added Font Import for a sleeker look */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --dobby-primary: #0f172a;
+    --dobby-secondary: #475569;
+    --dobby-accent: #38bdf8;
+    --dobby-light-bg: #f0f8ff; /* Consistent with your dashboard */
+    --dobby-user-bubble: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --dobby-bot-bubble: #ffffff;
+}
+
+/* Enhanced body with a gradient background */
+body.dobby-page {
+    background: linear-gradient(170deg, #e0f2fe 0%, #f0f8ff 100%);
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: var(--dobby-light-bg);
+}
+
+.back-to-dashboard-btn {
+    background: var(--dobby-primary);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.back-to-dashboard-btn:hover {
+    background: var(--dobby-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(15, 23, 42, 0.2);
+}
+
+.dobby-container {
+    max-width: 800px;
+    margin: 30px auto; /* Added more margin from top */
+    padding: 0 20px;
+}
+
+.dobby-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dobby-icon {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--dobby-primary);
+}
+
+.dobby-icon i {
+    font-size: 24px;
+    color: var(--dobby-primary);
+}
+
+.dobby-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dobby-primary);
+    margin: 0;
+}
+
+.chat-window {
+    background: rgba(255, 255, 255, 0.6); /* Frosted glass effect */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    height: 55vh; /* Adjusted height for better viewport fit */
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-sender {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--dobby-secondary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.message-content {
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 85%;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.bot-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.bot-message .message-content {
+    background: var(--dobby-bot-bubble);
+    color: var(--dobby-primary);
+    border-bottom-left-radius: 4px;
+}
+.user-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.user-message .message-sender {
+    justify-content: flex-end;
+}
+.user-message .message-content {
+    background: var(--dobby-user-bubble);
+    color: #f1f5f9;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    gap: 15px;
+}
+
+.chat-input-field {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.chat-input-field:focus {
+    border-color: var(--dobby-accent);
+    box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.3);
+}
+
+.ask-button {
+    background: var(--dobby-primary);
+    color: #f1f5f9;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ask-button:hover {
+    background: var(--dobby-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2);
+}
+.ask-button:active {
+    transform: translateY(0);
+    background: var(--dobby-primary);
+}
+
+/* Typing Indicator Styling */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 16px;
+    background: #e3f2fd;
+    border-radius: 18px;
+    max-width: 80px;
+    border-bottom-left-radius: 4px;
+}
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--dobby-secondary);
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Points notification (Copied from your code) */
+.points-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    z-index: 1000;
+    animation: slideInRight 0.5s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.points-notification i {
+    color: #fbbf24;
+    font-size: 1.2rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add a class to the body to scope our new background
+document.body.classList.add('dobby-page');
+
+// YOUR ORIGINAL JAVASCRIPT CODE - UNCHANGED
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chat-messages');
+    const userInput = document.getElementById('user-input');
+    const askButton = document.getElementById('ask-button');
+
+    // Function to add a message to the chat
+    function addMessage(content, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+        
+        const senderDiv = document.createElement('div');
+        senderDiv.className = 'message-sender';
+        senderDiv.textContent = isUser ? 'You' : 'Dobby';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.textContent = content;
+        
+        messageDiv.appendChild(senderDiv);
+        messageDiv.appendChild(contentDiv);
+        chatMessages.appendChild(messageDiv);
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Function to show typing indicator
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'message bot-message typing-indicator';
+        typingDiv.innerHTML = `
+            <div class="message-sender">Dobby</div>
+            <div class="message-content">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return typingDiv;
+    }
+
+    // Function to handle sending messages
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+        userInput.value = '';
+
+        // Show typing indicator
+        const typingIndicator = showTypingIndicator();
+
+        try {
+            // Call real OpenAI API through our backend
+            const response = await fetch('/api/dobby/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            });
+            
+            // Remove typing indicator
+            typingIndicator.remove();
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    addMessage(data.response, false);
+                    
+                    // Show points earned notification
+                    if (data.points_earned) {
+                        showPointsNotification(data.points_earned);
+                    }
+                } else {
+                    addMessage('Sorry, I encountered an error: ' + (data.error || 'Unknown error'), false);
+                }
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Error calling Dobby API:', error);
+            typingIndicator.remove();
+            addMessage('Sorry, I encountered an error. Please try again.', false);
+        }
+    }
+    
+    // Function to show points earned notification
+    function showPointsNotification(points) {
+        const notification = document.createElement('div');
+        notification.className = 'points-notification';
+        notification.innerHTML = `
+            <i class="fas fa-coins"></i>
+            +${points} Points earned!
+        `;
+        document.body.appendChild(notification);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 3000);
+    }
+
+    // Event listeners
+    askButton.addEventListener('click', sendMessage);
+    
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Focus on input when page loads
+    userInput.focus();
+});
+</script>
+{% endblock %}

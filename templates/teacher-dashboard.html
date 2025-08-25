@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard - Brainyac{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Root variables for the theme */
+    :root {
+        --primary-blue: #38B6FF;
+        --secondary-yellow: #FFD93D;
+        --accent-green: #6BCB77;
+        --accent-red: #FF6B6B;
+        --dark-text: #464E5F;
+        --light-text: #6c757d;
+        --light-bg: #F0F8FF;
+        --white: #ffffff;
+        --border-color: #e0e7ff;
+    }
+
+    /* General body styling */
+    body {
+        font-family: 'Baloo 2', cursive;
+        background-color: var(--light-bg);
+        color: var(--dark-text);
+        margin: 0;
+    }
+    .container {
+        padding: 30px;
+    }
+
+    /* Navbar styling */
+    .navbar {
+        background: var(--white);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+    .navbar h1 { font-weight: 800; font-size: 1.8rem; }
+    .user-info { display: flex; align-items: center; gap: 20px; font-weight: 700; }
+    .points-display { background: var(--secondary-yellow); padding: 8px 15px; border-radius: 20px; font-weight: 700; color: var(--dark-text); }
+    .logout-btn { background: var(--primary-blue); color: var(--white); border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: 700; font-family: 'Baloo 2', cursive; font-size: 1rem; }
+    
+    /* Dashboard Header */
+    .dashboard-header {
+        background: var(--white);
+        border-radius: 25px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+    .welcome-message { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 30px; }
+    .stat-card { padding: 20px; border-radius: 20px; color: var(--dark-text); }
+    .stat-card.yellow { background: var(--secondary-yellow); }
+    .stat-card.blue { background: var(--primary-blue); color: var(--white); }
+    .stat-card.green { background: var(--accent-green); color: var(--white); }
+    .stat-card.red { background: var(--accent-red); color: var(--white); }
+    .stat-card h3 { font-size: 2.8rem; font-weight: 800; margin: 0; }
+    .stat-card p { font-size: 1rem; font-weight: 600; opacity: 0.9; margin: 5px 0 0; }
+
+    /* Main layout with Sidebar */
+    .dashboard-layout { display: grid; grid-template-columns: 220px 1fr; gap: 30px; align-items: start; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 15px; }
+    .main-content { min-height: 400px; }
+
+    /* Sidebar tab buttons */
+    .tab-button {
+        background: var(--white); padding: 15px 20px; border: none; border-radius: 15px; cursor: pointer;
+        font-family: 'Baloo 2', cursive; font-size: 1.1rem; font-weight: 700; color: var(--dark-text);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.05); transition: all 0.3s ease;
+        display: flex; align-items: center; gap: 15px; width: 100%; justify-content: flex-start;
+    }
+    .tab-button:hover { transform: translateX(5px); box-shadow: 0 8px 15px rgba(0,0,0,0.07); }
+    .tab-button.active {
+        background: var(--primary-blue); color: var(--white);
+        transform: translateX(10px) scale(1.05);
+        box-shadow: 0 10px 20px rgba(56, 182, 255, 0.3);
+    }
+
+    /* Tab content styling */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .card { background: var(--white); padding: 30px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+    .card-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--light-bg); }
+    .card-header h3 { font-size: 1.8rem; font-weight: 700; margin: 0; }
+    .card-header p { color: var(--light-text); margin: 5px 0 0; }
+    
+    /* Doubt Cards Styling */
+    .doubt-card {
+        background: var(--white); border: 1px solid var(--border-color);
+        border-left: 5px solid var(--secondary-yellow); border-radius: 15px;
+        padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    }
+    .doubt-card.answered, .doubt-card.resolved { border-left-color: var(--accent-green); }
+    .doubt-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .doubt-topic { font-weight: 700; font-size: 1.2rem; }
+    .doubt-status { font-weight: 600; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; text-transform: capitalize; }
+    .doubt-status.pending { background-color: #fffbeb; color: #b45309; }
+    .doubt-status.answered { background-color: #ecfdf5; color: #065f46; }
+    .doubt-status.resolved { background-color: #eff6ff; color: #1d4ed8; }
+    .doubt-question { color: var(--light-text); margin-bottom: 15px; line-height: 1.6; }
+    .doubt-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #9ca3af; padding-top: 15px; border-top: 1px solid var(--border-color); }
+    .doubt-actions .btn { padding: 8px 16px; font-size: 0.9rem; background: var(--primary-blue); border: none; color: white; cursor: pointer; border-radius: 8px; }
+    .btn-reply { padding: 8px 16px; font-size: 0.9rem; background: #f59e0b; border: none; color: white; cursor: pointer; border-radius: 8px; }
+    .teacher-answer { margin-top: 15px; background: var(--light-bg); padding: 15px; border-left: 4px solid var(--accent-green); border-radius: 8px; }
+    .student-feedback { margin-top: 15px; background: #fffbeb; padding: 15px; border-left: 4px solid var(--secondary-yellow); border-radius: 8px; }
+
+    /* Modal Styles */
+    .modal {
+        display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+        width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);
+        align-items: center; justify-content: center;
+    }
+    .modal-content {
+        background-color: #fefefe; margin: 5% auto; padding: 0; border: none;
+        width: 90%; max-width: 600px; border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.3); animation: slide-down 0.4s ease-out;
+    }
+    @keyframes slide-down { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { padding: 20px 25px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { margin: 0; font-size: 1.5rem; }
+    .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .modal-body { padding: 25px; }
+    .doubt-details { background: #f8fafc; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .doubt-details h4, .comment-details h4 { margin: 0 0 10px 0; color: var(--primary-blue); }
+    .doubt-details p, .comment-details p { margin: 0 0 10px 0; line-height: 1.6; }
+    .doubt-details small { color: var(--light-text); }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; }
+    .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e0e7ff; border-radius: 10px; font-family: 'Baloo 2', cursive; font-size: 1rem; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-secondary { background-color: #e5e7eb; color: var(--dark-text); box-shadow: none; border: none; }
+    .file-input { display: none; }
+    .file-upload-label { display: inline-flex; align-items: center; padding: 12px 20px; border-radius: 15px; cursor: pointer; background-color: var(--light-bg); border: 2px dashed var(--primary-blue); color: var(--primary-blue); font-weight: 600; }
+    .file-preview { margin-top: 10px; font-weight: 600; color: var(--dark-text); }
+</style>
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar">
+    <h1 class="logo"><i class="fas fa-chalkboard-teacher"></i> Teacher Dashboard</h1>
+    <div class="user-info">
+        <div class="points-display">
+            <i class="fas fa-coins"></i> <span id="teacherPoints">0</span> Points
+        </div>
+        <span id="teacherName">Teacher</span>
+        <button class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="dashboard-header">
+        <h1 class="welcome-message">Welcome, <span id="welcomeName">Teacher</span>! 👨‍🏫</h1>
+        <p>Help students with their doubts and earn points through quality teaching!</p>
+        <div class="stats-grid">
+            <div class="stat-card yellow"><h3 id="doubtsAnsweredStat">0</h3><p>Doubts Answered</p></div>
+            <div class="stat-card blue"><h3 id="pointsEarnedStat">0</h3><p>Points Earned</p></div>
+            <div class="stat-card green"><h3 id="avgRatingStat">0.0</h3><p>Average Rating</p></div>
+            <div class="stat-card red"><h3 id="pendingDoubtsStat">0</h3><p>Pending Doubts</p></div>
+        </div>
+        <a href="{{ url_for('redeem') }}" class="btn" style="text-decoration: none; background: var(--primary-blue); margin-top: 20px;">
+            <i class="fas fa-gift"></i> Go to Redeem Rewards
+        </a>
+    </header>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar-nav">
+            <button class="tab-button active" data-tab="pending">
+                <i class="fas fa-clock"></i> Pending Doubts
+            </button>
+            <button class="tab-button" data-tab="answered">
+                <i class="fas fa-check-circle"></i> Answered Doubts
+            </button>
+            <button class="tab-button" data-tab="performance">
+                <i class="fas fa-chart-line"></i> Performance
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <div id="pending" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Pending Doubts</h3>
+                        <p>Students are waiting for your help with these questions.</p>
+                    </div>
+                    <div id="pending-doubts-container"></div>
+                </div>
+            </div>
+            <div id="answered" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Answered Doubts</h3>
+                        <p>Review your answers and student feedback.</p>
+                    </div>
+                    <div id="answered-doubts-container"></div>
+                </div>
+            </div>
+            <div id="performance" class="tab-content">
+                 <div class="card">
+                    <div class="card-header">
+                        <h3>Performance Analytics</h3>
+                        <p>Track your teaching effectiveness and earnings.</p>
+                    </div>
+                    <div id="performance-container"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div id="answer-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Answer Student's Doubt</h3>
+            <span class="close" onclick="closeAnswerModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="doubt-details">
+                <h4 id="modal-topic"></h4>
+                <p id="modal-question"></p>
+                <div id="modal-question-image"></div>
+                <small>Asked by: <span id="modal-student"></span></small>
+            </div>
+            <form id="answer-form">
+                <div class="form-group">
+                    <label for="answer-text">Your Answer</label>
+                    <textarea id="answer-text" name="answer" rows="6" placeholder="Provide a clear, detailed answer..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="answer-image">Upload Image (Optional)</label>
+                    <input type="file" id="answer-image" name="answer_image" accept="image/*,.pdf" class="file-input">
+                    <label for="answer-image" class="file-upload-label">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <span>Choose Image or PDF</span>
+                    </label>
+                    <div id="answer-file-preview" class="file-preview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAnswerModal()">Cancel</button>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-paper-plane"></i> Submit Answer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="reply-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Reply to Student's Comment</h3>
+            <span class="close" onclick="closeReplyModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="comment-details">
+                <h4>Student's Comment:</h4>
+                <p id="modal-student-comment"></p>
+            </div>
+            <form id="reply-form">
+                <div class="form-group">
+                    <label for="reply-text">Your Reply</label>
+                    <textarea id="reply-text" name="reply" rows="4" placeholder="Address the student's concerns..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeReplyModal()">Cancel</button>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-reply"></i> Send Reply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentDoubtId = null;
+
+    // --- Event Listeners ---
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', () => showTab(button.dataset.tab));
+    });
+    document.getElementById('answer-form')?.addEventListener('submit', handleAnswerSubmit);
+    document.getElementById('reply-form')?.addEventListener('submit', handleReplySubmit);
+
+    // --- Initial Data Loading ---
+    checkTeacherAuth();
+    loadTeacherStats();
+    loadPendingDoubts();
+
+    // --- Core Functions ---
+    async function checkTeacherAuth() {
+        try {
+            const response = await fetch('/api/user/profile');
+            if (!response.ok) throw new Error('Not authenticated');
+            
+            const data = await response.json();
+            if (data.success && data.user.role === 'teacher') {
+                updateTeacherDisplay(data.user);
+            } else {
+                window.location.href = '/auth';
+            }
+        } catch (error) {
+            console.error('Auth error:', error);
+            window.location.href = '/auth';
+        }
+    }
+
+    function updateTeacherDisplay(user) {
+        document.getElementById('welcomeName').textContent = user.name;
+        document.getElementById('teacherName').textContent = user.name;
+        document.getElementById('teacherPoints').textContent = user.points || 0;
+    }
+
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(tabName).classList.add('active');
+        document.querySelector(`[data-tab='${tabName}']`).classList.add('active');
+        
+        if (tabName === 'pending') loadPendingDoubts();
+        else if (tabName === 'answered') loadAnsweredDoubts();
+        else if (tabName === 'performance') loadTeacherStats();
+    }
+
+    async function loadTeacherStats() {
+        try {
+            const response = await fetch('/api/teacher/stats');
+            if (!response.ok) throw new Error('Failed to load stats');
+            
+            const data = await response.json();
+            if (data.success) {
+                updateStatsDisplay(data.stats);
+                renderPerformanceMetrics(data.stats);
+            }
+        } catch (error) { console.error('Error loading stats:', error); }
+    }
+
+    function updateStatsDisplay(stats) {
+        document.getElementById('doubtsAnsweredStat').textContent = stats.total_doubts_answered;
+        document.getElementById('pointsEarnedStat').textContent = stats.total_points_earned;
+        document.getElementById('avgRatingStat').textContent = (stats.average_rating || 0).toFixed(1);
+    }
+
+    function renderPerformanceMetrics(stats) {
+        const container = document.getElementById('performance-container');
+        container.innerHTML = `
+            <p>Total Doubts Answered: <strong>${stats.total_doubts_answered}</strong></p>
+            <p>Total Points Earned: <strong>${stats.total_points_earned}</strong></p>
+            <p>Average Student Rating: <strong>${(stats.average_rating || 0).toFixed(1)} / 5.0</strong></p>
+        `;
+    }
+
+    async function loadAllDoubts() {
+        try {
+            const response = await fetch('/api/teacher/doubts');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            if (data.success) return data.doubts;
+            return [];
+        } catch (error) {
+            console.error('Error fetching all doubts:', error);
+            return [];
+        }
+    }
+
+    async function loadPendingDoubts() {
+        const container = document.getElementById('pending-doubts-container');
+        container.innerHTML = `<p>Loading...</p>`;
+        const allDoubts = await loadAllDoubts();
+        const pendingDoubts = allDoubts.filter(d => d.status === 'pending');
+        document.getElementById('pendingDoubtsStat').textContent = pendingDoubts.length;
+        renderDoubts(pendingDoubts, container, 'pending');
+    }
+
+    async function loadAnsweredDoubts() {
+        const container = document.getElementById('answered-doubts-container');
+        container.innerHTML = `<p>Loading...</p>`;
+        const allDoubts = await loadAllDoubts();
+        const answeredDoubts = allDoubts.filter(d => d.status === 'answered' || d.status === 'resolved');
+        renderDoubts(answeredDoubts, container, 'answered');
+    }
+
+    function renderDoubts(doubts, container, type) {
+        if (doubts.length === 0) {
+            container.innerHTML = `<div class="empty-state"><h4>All caught up!</h4><p>There are no doubts in this category right now.</p></div>`;
+            return;
+        }
+
+        container.innerHTML = doubts.map(doubt => {
+            const questionText = doubt.question.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            const studentComment = (doubt.student_comment || '').replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+            const answerAction = type === 'pending' ? `<button class="btn" onclick="openAnswerModal(${doubt.id}, '${doubt.topic}', '${questionText}', '${doubt.student_name}')">Answer</button>` : '';
+            const teacherAnswer = (doubt.answer) ? `<div class="teacher-answer"><strong>Your Answer:</strong><p>${doubt.answer}</p></div>` : '';
+            const studentFeedback = (doubt.student_comment) ? `<div class="student-feedback"><strong>Student Feedback:</strong><p>${doubt.student_comment}</p><button class="btn-reply" onclick="openReplyModal(${doubt.id}, '${studentComment}')">Reply</button></div>` : '';
+            
+            return `
+                <div class="doubt-card ${doubt.status}">
+                    <div class="doubt-header">
+                        <span class="doubt-topic">${doubt.topic}</span>
+                        <span class="doubt-status ${doubt.status}">${doubt.status}</span>
+                    </div>
+                    <p class="doubt-question">${doubt.question}</p>
+                    ${teacherAnswer}
+                    ${studentFeedback}
+                    <div class="doubt-meta">
+                        <span><i class="fas fa-user"></i> ${doubt.student_name}</span>
+                        <span><i class="fas fa-clock"></i> ${new Date(doubt.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="doubt-actions">${answerAction}</div>
+                </div>`;
+        }).join('');
+    }
+
+    // --- Global Modal Functions ---
+    window.openAnswerModal = function(doubtId, topic, question, studentName) {
+        currentDoubtId = doubtId;
+        document.querySelector('#answer-modal #modal-topic').textContent = topic;
+        document.querySelector('#answer-modal #modal-question').textContent = question;
+        document.querySelector('#answer-modal #modal-student').textContent = studentName;
+        document.getElementById('answer-modal').style.display = 'flex';
+    }
+    window.closeAnswerModal = function() {
+        document.getElementById('answer-modal').style.display = 'none';
+        document.getElementById('answer-form').reset();
+    }
+    window.openReplyModal = function(doubtId, studentComment) {
+        currentDoubtId = doubtId;
+        document.querySelector('#reply-modal #modal-student-comment').textContent = studentComment;
+        document.getElementById('reply-modal').style.display = 'flex';
+    }
+    window.closeReplyModal = function() {
+        document.getElementById('reply-modal').style.display = 'none';
+        document.getElementById('reply-form').reset();
+    }
+
+    // --- Form Submission Handlers ---
+    async function handleAnswerSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(document.getElementById('answer-form'));
+        formData.append('doubt_id', currentDoubtId);
+        
+        try {
+            const response = await fetch('/api/teacher/answer-doubt', { method: 'POST', body: formData });
+            const data = await response.json();
+            if (data.success) {
+                closeAnswerModal();
+                loadPendingDoubts();
+                loadAnsweredDoubts();
+                loadTeacherStats();
+            } else { alert('Error: ' + data.error); }
+        } catch (error) { console.error('Error submitting answer:', error); alert('An error occurred.'); }
+    }
+
+    async function handleReplySubmit(e) {
+        e.preventDefault();
+        const reply = document.getElementById('reply-text').value;
+        try {
+            const response = await fetch('/api/teacher/reply-to-comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ doubt_id: currentDoubtId, reply: reply })
+            });
+            const data = await response.json();
+            if (data.success) {
+                closeReplyModal();
+                loadAnsweredDoubts();
+            } else { alert('Error: ' + data.error); }
+        } catch (error) { console.error('Error submitting reply:', error); alert('An error occurred.'); }
+    }
+
+    // --- Global Logout Function ---
+    window.logout = function() {
+        fetch('/api/logout', { method: 'POST' }).then(() => window.location.href = '/auth');
+    }
+});
+</script>
+{% endblock %}

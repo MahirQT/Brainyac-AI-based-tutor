@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Brainyac!{% endblock %}
+
+{% block content %}
+    <div class="auth-page-wrapper">
+        <div class="auth-container">
+            <!-- Illustration Section -->
+            <div class="auth-illustration">
+                <img src="{{ url_for('static', filename='brain-fod.png') }}" alt="Friendly Mascot">
+                <h2>Let the Adventure Begin!</h2>
+            </div>
+             
+
+            <!-- Form Section -->
+            <div class="auth-card">
+                <div class="auth-header">
+                    <img src="{{ url_for('static', filename='BOT-WITH-MAN-UNFILTERED-removebg.png') }}" alt="Brainyac Logo" class="auth-logo">
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="showAuthTab('signin')">Sign In</button>
+                    <button class="auth-tab" onclick="showAuthTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- Sign In Form -->
+                <div id="signin-form" class="auth-form active">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="login-email">Your Email</label>
+                            <input type="email" id="login-email" name="email" required placeholder="you@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Your Password</label>
+                            <input type="password" id="login-password" name="password" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-full">
+                            <i class="fas fa-rocket"></i> Let's Go!
+                        </button>
+                    </form>
+                </div>
+            
+                <!-- Sign Up Form -->
+                <div id="signup-form" class="auth-form">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="register-name">Your Name</label>
+                            <input type="text" id="register-name" name="name" required placeholder="e.g., Alex">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Your Email</label>
+                            <input type="email" id="register-email" name="email" required placeholder="you@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Create a Password</label>
+                            <input type="password" id="register-password" name="password" required placeholder="••••••••">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-role">I am a...</label>
+                            <select id="register-role" name="role" required>
+                                <option value="" disabled selected>Choose one...</option>
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-full">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-blue: #38B6FF;
+        --secondary-yellow: #FFD93D;
+        --accent-green: #6BCB77;
+        --dark-text: #464E5F;
+        --light-bg: #F0F8FF; /* Light Sky Blue Background */
+        --white: #ffffff;
+    }
+
+    /* Override base styles for a full-page layout */
+    body {
+        font-family: 'Baloo 2', cursive;
+        background-color: var(--light-bg);
+    }
+
+    .auth-page-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .auth-container {
+        display: flex;
+        width: 100%;
+        max-width: 950px;
+        background: var(--white);
+        border-radius: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .auth-illustration {
+        background-color: var(--secondary-yellow);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 45%;
+ 
+    }   
+
+     .auth-illustration img {
+        max-width: 100%;
+        height: auto;
+         animation: bounce 2s infinite;
+    }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+    .auth-illustration h2 {
+        color: var(--dark-text);
+        font-size: 1.8rem;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .auth-card {
+        padding: 40px;
+        width: 55%;
+        z-index: 12;
+    }
+
+    .auth-header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+    .auth-logo {
+        width: 400px;
+        height: auto;
+        z-index: 40;
+
+    }
+
+    .auth-tabs {
+        display: flex;
+        background-color: #f0f0f0;
+        border-radius: 50px;
+        padding: 6px;
+        margin-bottom: 30px;
+    }
+
+    .auth-tab {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        background: transparent;
+        border-radius: 50px;
+        font-family: 'Baloo 2', cursive;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .auth-tab.active {
+        background: var(--primary-blue);
+        color: var(--white);
+        box-shadow: 0 4px 10px rgba(56, 182, 255, 0.4);
+    }
+
+    .auth-form {
+        display: none;
+    }
+
+    .auth-form.active {
+        display: block;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--dark-text);
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 14px;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        font-family: 'Baloo 2', cursive;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        -webkit-appearance: none; /* Removes default select arrow */
+        -moz-appearance: none;
+        appearance: none;
+        background-color: #fff; /* Ensures select has a background */
+    }
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+    }
+
+    .btn-full {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 15px;
+        font-family: 'Baloo 2', cursive;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        background: var(--accent-green);
+        color: var(--white);
+        box-shadow: 0 4px 0 #4a9352;
+        transition: all 0.2s ease;
+        margin-top: 10px;
+    }
+    .btn-full:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #4a9352;
+    }
+    .btn-full:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 #4a9352;
+    }
+    
+    /* Responsive */
+    @media (max-width: 850px) {
+        .auth-illustration {
+            display: none;
+        }
+        .auth-card {
+            width: 100%;
+        }
+        .auth-container {
+            margin: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showAuthTab(tabName) {
+    // Hide all forms
+    document.querySelectorAll('.auth-form').forEach(form => {
+        form.classList.remove('active');
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected form
+    document.getElementById(tabName + '-form').classList.add('active');
+    
+    // Make clicked tab active
+    // A bit safer than event.target if called from elsewhere
+    document.querySelector(`.auth-tab[onclick*="${tabName}"]`).classList.add('active');
+}
+
+// Your existing form handlers for login and registration
+// Sign In Form Handler
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    
+    try {
+        const response = await fetch('/api/signin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.role === 'student') {
+                window.location.href = '/student-dashboard';
+            } else {
+                window.location.href = '/teacher-dashboard';
+            }
+        } else {
+            alert(data.error || 'Login failed'); // Replace with a nicer alert
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('An error occurred during login');
+    }
+});
+
+// Sign Up Form Handler
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const role = formData.get('role');
+    
+    try {
+        const response = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, role })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Account created successfully! Please sign in.'); // Replace with a nicer alert
+            showAuthTab('signin');
+            e.target.reset();
+        } else {
+            alert(data.error || 'Registration failed');
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('An error occurred during registration');
+    }
+});
+</script>
+{% endblock %}

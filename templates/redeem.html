@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Redeem Rewards - Brainyac{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-blue: #38B6FF;
+        --secondary-yellow: #FFD93D;
+        --accent-green: #6BCB77;
+        --dark-text: #464E5F;
+        --light-bg: #F0F8FF;
+        --white: #ffffff;
+    }
+    .redeem-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .redeem-header h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .points-balance {
+        background: var(--secondary-yellow);
+        display: inline-block;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--dark-text);
+        box-shadow: 0 5px 15px rgba(255, 217, 61, 0.4);
+    }
+    .rewards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+    .reward-card {
+        background: var(--white);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.07);
+        text-align: center;
+        padding: 30px;
+        transition: all 0.3s ease;
+    }
+    .reward-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    .reward-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: var(--primary-blue);
+    }
+    .reward-card h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .reward-card p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+    .points-cost {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+    .btn-redeem {
+        background: var(--accent-green);
+        color: var(--white);
+        border: none;
+        padding: 14px 30px;
+        border-radius: 25px;
+        font-family: 'Baloo 2', cursive;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .btn-redeem:disabled {
+        background-color: #9e9e9e;
+        cursor: not-allowed;
+    }
+    .btn-redeem:hover:not(:disabled) {
+        background: #56a860;
+        transform: scale(1.05);
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background: var(--white);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        width: 90%;
+        max-width: 500px;
+        animation: zoomIn 0.4s;
+    }
+    @keyframes zoomIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon {
+        font-size: 4rem;
+        color: var(--accent-green);
+        margin-bottom: 20px;
+    }
+    .modal-content h2 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    .reward-code {
+        background: var(--light-bg);
+        border: 2px dashed var(--primary-blue);
+        padding: 15px;
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin: 20px 0;
+        color: var(--dark-text);
+        cursor: pointer;
+    }
+    .close-modal {
+        margin-top: 25px;
+        background: var(--primary-blue);
+        color: var(--white);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="redeem-header">
+        <h1>Redeem Your Points</h1>
+        <div class="points-balance">
+            <i class="fas fa-coins"></i> Your Points: <span id="userPoints">Loading...</span>
+        </div>
+    </div>
+
+    <div class="rewards-grid">
+        <div class="reward-card">
+            <div class="reward-icon"><i class="fab fa-amazon"></i></div>
+            <h3>Amazon Voucher</h3>
+            <p>Get a digital Amazon voucher to spend on millions of items.</p>
+            <div class="points-cost">50 Points</div>
+            <button class="btn-redeem" data-reward="Amazon">Redeem Now</button>
+        </div>
+
+        <div class="reward-card">
+            <div class="reward-icon"><i class="fas fa-store"></i></div>
+            <h3>Platform Giftshop</h3>
+            <p>Use your points in our exclusive giftshop for cool merchandise.</p>
+            <div class="points-cost">50 Points</div>
+            <button class="btn-redeem" data-reward="Giftshop">Redeem Now</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-icon"><i class="fas fa-check-circle"></i></div>
+        <h2>Success!</h2>
+        <p>Here is your unique reward code. Copy it and keep it safe!</p>
+        <div id="redeemedCode" class="reward-code" title="Click to copy"></div>
+        <p><small>You can view your past codes on your profile page.</small></p>
+        <button class="btn-redeem close-modal" onclick="closeModal()">Close</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userPointsSpan = document.getElementById('userPoints');
+    const redeemButtons = document.querySelectorAll('.btn-redeem');
+    const modal = document.getElementById('successModal');
+    const redeemedCodeSpan = document.getElementById('redeemedCode');
+    let currentUserPoints = 0;
+
+    // Fetch user profile to get points
+    async function fetchUserProfile() {
+        try {
+            const response = await fetch('/api/user/profile');
+            const data = await response.json();
+            if (data.success) {
+                currentUserPoints = data.user.points || 0;
+                userPointsSpan.textContent = currentUserPoints;
+                updateButtonStates();
+            } else {
+                userPointsSpan.textContent = 'Error';
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            userPointsSpan.textContent = 'Error';
+        }
+    }
+
+    // Enable/disable buttons based on points
+    function updateButtonStates() {
+        redeemButtons.forEach(button => {
+            if (currentUserPoints >= 50) {
+                button.disabled = false;
+            } else {
+                button.disabled = true;
+            }
+        });
+    }
+
+    // Handle redeem button click
+    redeemButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const rewardType = button.dataset.reward;
+            if (confirm(`Are you sure you want to spend 50 points for a ${rewardType} voucher?`)) {
+                try {
+                    const response = await fetch('/api/redeem-points', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reward_type: rewardType })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        redeemedCodeSpan.textContent = data.reward_code;
+                        modal.style.display = 'flex';
+                        // Update points on the page
+                        currentUserPoints = data.new_points_total;
+                        userPointsSpan.textContent = currentUserPoints;
+                        updateButtonStates();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                } catch (error) {
+                    alert('An error occurred. Please try again.');
+                }
+            }
+        });
+    });
+
+    // Copy code to clipboard
+    redeemedCodeSpan.addEventListener('click', () => {
+        navigator.clipboard.writeText(redeemedCodeSpan.textContent).then(() => {
+            alert('Code copied to clipboard!');
+        }, () => {
+            alert('Failed to copy code.');
+        });
+    });
+
+    // Initial load
+    fetchUserProfile();
+});
+
+function closeModal() {
+    document.getElementById('successModal').style.display = 'none';
+}
+</script>
+{% endblock %}

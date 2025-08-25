@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Demo - BRAINYAC % endblock %}
+
+{% block content %}
+<div class="demo-container">
+    <div class="demo-header">
+        <h1><i class="fas fa-rocket"></i> BRAINYAC </h1>
+        <p>Experience the power of AI-driven learning in action!</p>
+    </div>
+
+    <div class="demo-grid">
+        <div class="demo-card">
+            <div class="demo-card-header">
+                <i class="fas fa-robot"></i>
+                <h3>AI Chat Assistant</h3>
+            </div>
+            <p>Ask questions and get instant AI-powered answers to help with your studies.</p>
+            <div class="demo-chat">
+                <div class="chat-messages" id="demo-chat-messages">
+                    <div class="message bot">
+                        Hi! I'm your AI learning assistant. Ask me anything about your studies!
+                    </div>
+                </div>
+                <form class="chat-input" id="demo-chat-form">
+                    <input type="text" placeholder="Type your question here..." required>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-card-header">
+                <i class="fas fa-clone"></i>
+                <h3>Flashcard Generator</h3>
+            </div>
+            <p>Generate study flashcards for any topic using AI.</p>
+            <form id="demo-flashcard-form">
+                <input type="text" placeholder="Enter a topic (e.g., Photosynthesis)" required>
+                <button type="submit" class="btn">
+                    <i class="fas fa-bolt"></i> Generate
+                </button>
+            </form>
+            <div id="demo-flashcard-container">
+                <!-- Generated flashcards will appear here -->
+            </div>
+        </div>
+
+        <div class="demo-card">
+            <div class="demo-card-header">
+                <i class="fas fa-vial"></i>
+                <h3>QnA Generator</h3>
+            </div>
+            <p>Create practice questions on any subject.</p>
+            <form id="demo-qna-form">
+                <input type="text" placeholder="Enter a topic (e.g., World War II)" required>
+                <button type="submit" class="btn">
+                    <i class="fas fa-play"></i> Generate QnA
+                </button>
+            </form>
+            <div id="demo-qna-container">
+                <!-- Generated questions will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-footer">
+        <a href="/auth" class="btn demo-button">
+            <i class="fas fa-user"></i> Get Started
+        </a>
+        <a href="/" class="btn demo-button secondary">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+.demo-header {
+            text-align: center;
+    margin-bottom: 40px;
+            color: white;
+        }
+
+.demo-header h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.demo-header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.demo-card {
+            background: white;
+            border-radius: 20px;
+    padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.demo-card:hover {
+    transform: translateY(-5px);
+}
+
+.demo-card-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+.demo-card-header i {
+    font-size: 3rem;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.demo-card-header h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.demo-card p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.demo-chat {
+    border: 2px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+.demo-chat .chat-messages {
+    height: 200px;
+    padding: 15px;
+    background: #f8f9fa;
+            overflow-y: auto;
+}
+
+.demo-chat .chat-input {
+            display: flex;
+            padding: 15px;
+    background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+.demo-chat .chat-input input {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+.demo-footer {
+            text-align: center;
+    margin-top: 40px;
+}
+
+.demo-footer .btn {
+    margin: 0 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Demo functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Demo chat functionality
+    const demoChatForm = document.getElementById('demo-chat-form');
+    const demoChatMessages = document.getElementById('demo-chat-messages');
+    
+    demoChatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const input = e.target.querySelector('input');
+        const message = input.value.trim();
+        if (!message) return;
+        
+        // Add user message
+        addDemoMessage(message, 'user');
+        input.value = '';
+        
+        // Simulate AI response (in real app, this would call the API)
+        setTimeout(() => {
+            const responses = [
+                "That's a great question! Let me explain...",
+                "I'd be happy to help you with that!",
+                "That's an interesting topic. Here's what I know...",
+                "Let me break this down for you...",
+                "Great question! This is a common topic students ask about."
+            ];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addDemoMessage(randomResponse, 'bot');
+        }, 1000);
+    });
+    
+    // Demo flashcard functionality
+    const demoFlashcardForm = document.getElementById('demo-flashcard-form');
+    const demoFlashcardContainer = document.getElementById('demo-flashcard-container');
+    
+    demoFlashcardForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const input = e.target.querySelector('input');
+        const topic = input.value.trim();
+        if (!topic) return;
+        
+        // Show loading
+        demoFlashcardContainer.innerHTML = '<p>Generating flashcards...</p>';
+        
+        // Simulate API call
+        setTimeout(() => {
+            const demoFlashcards = [
+                { term: "Term 1", definition: "Definition for term 1" },
+                { term: "Term 2", definition: "Definition for term 2" },
+                { term: "Term 3", definition: "Definition for term 3" }
+            ];
+            renderDemoFlashcards(demoFlashcards);
+        }, 2000);
+    });
+    
+    // Demo QnA functionality
+    const demoQnaForm = document.getElementById('demo-qna-form');
+    const demoQnaContainer = document.getElementById('demo-qna-container');
+    
+    demoQnaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const input = e.target.querySelector('input');
+        const topic = input.value.trim();
+        if (!topic) return;
+        
+        // Show loading
+        demoQnaContainer.innerHTML = '<p>Generating questions...</p>';
+        
+        // Simulate API call
+        setTimeout(() => {
+            const demoQuestions = [
+                "What is the main concept of this topic?",
+                "How does this relate to other subjects?",
+                "What are the key points to remember?"
+            ];
+            renderDemoQna(demoQuestions);
+        }, 2000);
+    });
+});
+
+function addDemoMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+    messageDiv.textContent = message;
+    
+    const chatMessages = document.getElementById('demo-chat-messages');
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function renderDemoFlashcards(flashcards) {
+    const container = document.getElementById('demo-flashcard-container');
+    container.innerHTML = '';
+    
+    flashcards.forEach(card => {
+        const flashcardDiv = document.createElement('div');
+        flashcardDiv.className = 'flashcard';
+        flashcardDiv.innerHTML = `
+            <div class="flashcard-inner">
+                <div class="flashcard-front">
+                    <p>${card.term}</p>
+                </div>
+                <div class="flashcard-back">
+                    <p>${card.definition}</p>
+                </div>
+                    </div>
+                `;
+        
+        flashcardDiv.addEventListener('click', () => {
+            flashcardDiv.classList.toggle('is-flipped');
+        });
+        
+        container.appendChild(flashcardDiv);
+    });
+}
+
+function renderDemoQna(questions) {
+    const container = document.getElementById('demo-qna-container');
+    container.innerHTML = '';
+    
+    questions.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'card';
+        questionDiv.innerHTML = `
+            <h4>Question ${index + 1}</h4>
+            <p>${question}</p>
+        `;
+        container.appendChild(questionDiv);
+    });
+        }
+    </script>
+{% endblock %} 
